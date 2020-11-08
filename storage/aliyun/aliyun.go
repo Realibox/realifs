@@ -35,38 +35,37 @@ type UploadPolicy struct {
 }
 
 // Init aliyun storage
-func (aliyun *Aliyun) Init() {
+func (aliyun *Aliyun) Init() error {
 	client, err := oss.New(aliyun.ExternalEndpoint, aliyun.AccessKeyID, aliyun.AccessKeySecret)
 	if err != nil {
 		fmt.Println("oss New Error:", err)
+		return err
 	}
 	aliyun.Client = client
 	bucket, err := client.Bucket(aliyun.BucketName)
 	if err != nil {
 		fmt.Println("bucket init Error:", err)
+		return err
 	}
 	aliyun.Bucket = bucket
+	return nil
 }
 
 // UploadLocalFile 上传本地文件
 func (aliyun *Aliyun) UploadLocalFile(filePath string, remoteFilePath string) error {
 	// 上传本地文件
-	err := aliyun.Bucket.PutObjectFromFile(remoteFilePath, filePath)
-	if err != nil {
-		fmt.Println("Error:", err)
+	if err := aliyun.Bucket.PutObjectFromFile(remoteFilePath, filePath); err != nil {
 		return err
 	}
-	return err
+	return nil
 }
 
 // DeleteSingleFile func
 func (aliyun *Aliyun) DeleteSingleFile(remoteFilePath string) error {
-	err := aliyun.Bucket.DeleteObject(remoteFilePath)
-	if err != nil {
-		fmt.Println("Delete Error:", err)
+	if err := aliyun.Bucket.DeleteObject(remoteFilePath); err != nil {
 		return err
 	}
-	return err
+	return nil
 }
 
 // IsFileExist 判断文件是否存在
